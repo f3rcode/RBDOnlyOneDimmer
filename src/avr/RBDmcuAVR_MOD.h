@@ -2,7 +2,7 @@
 #define RBDMCUAVR_H
 
 #include "Arduino.h"
-#include "RBDdimmer.h"
+#include "RBDdimmer_MOD.h"
 #include <avr/io.h>
 #include <stdio.h>
 #include <avr/interrupt.h>
@@ -11,7 +11,7 @@
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define DIMMER_TIMER 4
-#define INT_vect INT4_vect   
+#define INT_vect INT4_vect
 #define INTx INT4
 #define EICRX EICRB
 #define ISCx1 ISC41
