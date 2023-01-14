@@ -25,25 +25,16 @@
 
 int pulseWidth = 2;
 
-//static int toggleCounter = 0;
-//static int toggleReload = 25;
-
-//static dimmerLamp dimmer;
 volatile uint16_t dimPower;
 volatile uint16_t dimOutPin;
 volatile uint16_t zeroCross;
-//volatile DIMMER_MODE_typedef dimMode;
 volatile ON_OFF_typedef dimState;
 volatile uint16_t dimCounter;
 static uint16_t dimPulseBegin;
-//volatile uint16_t togMax;
-//volatile uint16_t togMin;
-//volatile bool togDir;
 
 dimmerLamp::dimmerLamp(int user_dimmer_pin):
 	dimmer_pin(user_dimmer_pin)
 {
-	//dimmer = this;
 	timer_num = DIMMER_TIMER;
 	toggle_state = false;
 
@@ -51,9 +42,6 @@ dimmerLamp::dimmerLamp(int user_dimmer_pin):
 	dimOutPin = user_dimmer_pin;
 	dimCounter = 0;
 	zeroCross = 0;
-	//dimMode = NORMAL_MODE;
-	//togMin = 0;
-	//togMax = 1;
 	pinMode(user_dimmer_pin, OUTPUT);
 }
 
@@ -83,7 +71,6 @@ void dimmerLamp::ext_int_init(void)
 
 void dimmerLamp::begin(DIMMER_MODE_typedef DIMMER_MODE, ON_OFF_typedef ON_OFF)
 {
-	//dimMode = DIMMER_MODE;
 	dimState = ON_OFF;
 	timer_init();
 	ext_int_init();
@@ -121,40 +108,6 @@ bool dimmerLamp::getState(void)
 	return ret;
 }
 
-/*void dimmerLamp::changeState(void)
-{
-	if (dimState[0] == ON) dimState[0] = OFF;
-	else
-		dimState[0] = ON;
-}
-
-DIMMER_MODE_typedef dimmerLamp::getMode(void)
-{
-	return dimMode[0];
-}
-
-void dimmerLamp::setMode(DIMMER_MODE_typedef DIMMER_MODE)
-{
-	dimMode[0] = DIMMER_MODE;
-}
-
-void dimmerLamp::toggleSettings(int minValue, int maxValue)
-{
-	if (maxValue > 99)
-	{
-    	maxValue = 99;
-	}
-	if (minValue < 1)
-	{
-    	minValue = 1;
-	}
-	dimMode[0] = TOGGLE_MODE;
-	togMin[0] = minValue;
-	togMax[0] = maxValue;
-
-	toggleReload = 50;
-}*/
-
 ISR(INT_vect)
 {
 //Serial.println("i");
@@ -167,33 +120,9 @@ ISR(INT_vect)
 static int k;
 ISR (TIMER_COMPA_VECTOR(DIMMER_TIMER))
 {
-	//toggleCounter++;
-	//Serial.print("c");
-
 		if (zeroCross == 1 )
 		{
 			dimCounter++;
-			/*if (dimMode == TOGGLE_MODE)
-			{
-			//
-			// TOGGLE DIMMING MODE
-			//
-			if (dimPulseBegin >= togMax)
-			{
-				// if reach max dimming value
-				togDir = false;	// downcount
-			}
-			if (dimPulseBegin <= togMin)
-			{
-				// if reach min dimming value
-				togDir = true;	// upcount
-			}
-			if (toggleCounter == toggleReload)
-			{
-				if (togDir == true) dimPulseBegin++;
-				else dimPulseBegin--;
-			}
-		}*/
 
 			/*****
 			 * DEFAULT DIMMING MODE (NOT TOGGLE)
@@ -214,7 +143,6 @@ ISR (TIMER_COMPA_VECTOR(DIMMER_TIMER))
 
 	}
 
-	//if (toggleCounter >= toggleReload) toggleCounter = 1;
 	TIFRx(DIMMER_TIMER) |= ((1<<OCFxB(DIMMER_TIMER))|(1<<OCFxA(DIMMER_TIMER)));
 }
 
