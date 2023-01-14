@@ -25,20 +25,20 @@
 
 int pulseWidth = 2;
 
-static int toggleCounter = 0;
-static int toggleReload = 25;
+//static int toggleCounter = 0;
+//static int toggleReload = 25;
 
 //static dimmerLamp dimmer;
 volatile uint16_t dimPower;
 volatile uint16_t dimOutPin;
 volatile uint16_t zeroCross;
-volatile DIMMER_MODE_typedef dimMode;
+//volatile DIMMER_MODE_typedef dimMode;
 volatile ON_OFF_typedef dimState;
 volatile uint16_t dimCounter;
 static uint16_t dimPulseBegin;
-volatile uint16_t togMax;
-volatile uint16_t togMin;
-volatile bool togDir;
+//volatile uint16_t togMax;
+//volatile uint16_t togMin;
+//volatile bool togDir;
 
 dimmerLamp::dimmerLamp(int user_dimmer_pin):
 	dimmer_pin(user_dimmer_pin)
@@ -51,9 +51,9 @@ dimmerLamp::dimmerLamp(int user_dimmer_pin):
 	dimOutPin = user_dimmer_pin;
 	dimCounter = 0;
 	zeroCross = 0;
-	dimMode = NORMAL_MODE;
-	togMin = 0;
-	togMax = 1;
+	//dimMode = NORMAL_MODE;
+	//togMin = 0;
+	//togMax = 1;
 	pinMode(user_dimmer_pin, OUTPUT);
 }
 
@@ -62,11 +62,12 @@ void dimmerLamp::timer_init(void)
 	TCCRxA(DIMMER_TIMER) &= ~(0xFF); // clean TCCRxA register
 	TCCRxB(DIMMER_TIMER) &= ~(0xFF); // clean TCCRxB register
 
-	TIMSKx(DIMMER_TIMER) |= (1 << OCIExA(DIMMER_TIMER)); //устанавливаем бит разрешения прерывания 1ого счетчика по совпадению с OCR1A(H и L)
+  //set the interrupt enable bit of the 1st counter to match OCR1A(H and L)
+	TIMSKx(DIMMER_TIMER) |= (1 << OCIExA(DIMMER_TIMER));
 
-	TCCRxB(DIMMER_TIMER) = TCCRxB_VALUE;
-	if (DIMMER_TIMER != 2) OCRxAH(DIMMER_TIMER) = OCRxAH_VALUE;
-	OCRxAL(DIMMER_TIMER) = OCRxAL_VALUE;
+	TCCRxB(DIMMER_TIMER) = TCCRxB_VALUE; //0x09 =  0b1010  (1 << WGMx2)|(1 << CSx1)
+	if (DIMMER_TIMER != 2) OCRxAH(DIMMER_TIMER) = OCRxAH_VALUE; //0x00
+	OCRxAL(DIMMER_TIMER) = OCRxAL_VALUE; //0xFF
 
 	TIMSKx(DIMMER_TIMER) |= (1 << TOIEx(DIMMER_TIMER)); //timer interrupt enable
 }
@@ -82,7 +83,7 @@ void dimmerLamp::ext_int_init(void)
 
 void dimmerLamp::begin(DIMMER_MODE_typedef DIMMER_MODE, ON_OFF_typedef ON_OFF)
 {
-	dimMode = DIMMER_MODE;
+	//dimMode = DIMMER_MODE;
 	dimState = ON_OFF;
 	timer_init();
 	ext_int_init();
@@ -166,17 +167,17 @@ ISR(INT_vect)
 static int k;
 ISR (TIMER_COMPA_VECTOR(DIMMER_TIMER))
 {
-	toggleCounter++;
+	//toggleCounter++;
 	//Serial.print("c");
 
 		if (zeroCross == 1 )
 		{
 			dimCounter++;
-			if (dimMode == TOGGLE_MODE)
+			/*if (dimMode == TOGGLE_MODE)
 			{
-			/*****
-			 * TOGGLE DIMMING MODE
-			 *****/
+			//
+			// TOGGLE DIMMING MODE
+			//
 			if (dimPulseBegin >= togMax)
 			{
 				// if reach max dimming value
@@ -192,7 +193,7 @@ ISR (TIMER_COMPA_VECTOR(DIMMER_TIMER))
 				if (togDir == true) dimPulseBegin++;
 				else dimPulseBegin--;
 			}
-			}
+		}*/
 
 			/*****
 			 * DEFAULT DIMMING MODE (NOT TOGGLE)
@@ -213,7 +214,7 @@ ISR (TIMER_COMPA_VECTOR(DIMMER_TIMER))
 
 	}
 
-	if (toggleCounter >= toggleReload) toggleCounter = 1;
+	//if (toggleCounter >= toggleReload) toggleCounter = 1;
 	TIFRx(DIMMER_TIMER) |= ((1<<OCFxB(DIMMER_TIMER))|(1<<OCFxA(DIMMER_TIMER)));
 }
 
